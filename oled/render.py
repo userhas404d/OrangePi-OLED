@@ -59,9 +59,10 @@ class canvas(object):
     can draw upon. As soon as the with-block completes, the resultant image is
     flushed onto the device.
     """
+
     def __init__(self, device):
         self.draw = None
-        self.image = Image.new('1', (device.width, device.height))
+        self.image = Image.new("1", (device.width, device.height))
         self.device = device
 
     def __enter__(self):
@@ -73,5 +74,5 @@ class canvas(object):
             # do the drawing onto the device
             self.device.display(self.image)
 
-        del self.draw   # Tidy up the resources
-        return False    # Never suppress exceptions
+        del self.draw  # Tidy up the resources
+        return False  # Never suppress exceptions

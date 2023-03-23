@@ -69,7 +69,7 @@ class device(object):
         Sends a command or sequence of commands through to the
         device - maximum allowed is 32 bytes in one go.
         """
-        assert(len(cmd) <= 32)
+        assert len(cmd) <= 32
         self.bus.write_i2c_block_data(self.addr, self.cmd_mode, list(cmd))
 
     def data(self, data):
@@ -79,9 +79,9 @@ class device(object):
         data is larger than this it is sent in chunks.
         """
         for i in range(0, len(data), 32):
-            self.bus.write_i2c_block_data(self.addr,
-                                          self.data_mode,
-                                          list(data[i:i+32]))
+            self.bus.write_i2c_block_data(
+                self.addr, self.data_mode, list(data[i : i + 32])
+            )
 
 
 class sh1106(device):
@@ -102,34 +102,46 @@ class sh1106(device):
         self.command(
             const.DISPLAYOFF,
             const.MEMORYMODE,
-            const.SETHIGHCOLUMN,      0xB0, 0xC8,
-            const.SETLOWCOLUMN,       0x10, 0x40,
-            const.SETCONTRAST,        0x7F,
+            const.SETHIGHCOLUMN,
+            0xB0,
+            0xC8,
+            const.SETLOWCOLUMN,
+            0x10,
+            0x40,
+            const.SETCONTRAST,
+            0x7F,
             const.SETSEGMENTREMAP,
             const.NORMALDISPLAY,
-            const.SETMULTIPLEX,       0x3F,
+            const.SETMULTIPLEX,
+            0x3F,
             const.DISPLAYALLON_RESUME,
-            const.SETDISPLAYOFFSET,   0x00,
-            const.SETDISPLAYCLOCKDIV, 0xF0,
-            const.SETPRECHARGE,       0x22,
-            const.SETCOMPINS,         0x12,
-            const.SETVCOMDETECT,      0x20,
-            const.CHARGEPUMP,         0x14,
-            const.DISPLAYON)
+            const.SETDISPLAYOFFSET,
+            0x00,
+            const.SETDISPLAYCLOCKDIV,
+            0xF0,
+            const.SETPRECHARGE,
+            0x22,
+            const.SETCOMPINS,
+            0x12,
+            const.SETVCOMDETECT,
+            0x20,
+            const.CHARGEPUMP,
+            0x14,
+            const.DISPLAYON,
+        )
 
     def display(self, image):
         """
         Takes a 1-bit image and dumps it to the SH1106 OLED display.
         """
-        assert(image.mode == '1')
-        assert(image.size[0] == self.width)
-        assert(image.size[1] == self.height)
+        assert image.mode == "1"
+        assert image.size[0] == self.width
+        assert image.size[1] == self.height
 
         page = 0xB0
         pix = list(image.getdata())
         step = self.width * 8
         for y in range(0, int(self.pages * step), step):
-
             # move to given page, then reset the column address
             self.command(page, 0x02, 0x10)
             page += 1
@@ -154,6 +166,7 @@ class ssd1306(device):
     called to affect the brightness. Direct use of the command() and
     data() methods are discouraged.
     """
+
     def __init__(self, port=1, address=0x3C):
         super(ssd1306, self).__init__(port, address)
         self.width = 128
@@ -162,39 +175,54 @@ class ssd1306(device):
 
         self.command(
             const.DISPLAYOFF,
-            const.SETDISPLAYCLOCKDIV, 0x80,
-            const.SETMULTIPLEX,       0x3F,
-            const.SETDISPLAYOFFSET,   0x00,
+            const.SETDISPLAYCLOCKDIV,
+            0x80,
+            const.SETMULTIPLEX,
+            0x3F,
+            const.SETDISPLAYOFFSET,
+            0x00,
             const.SETSTARTLINE,
-            const.CHARGEPUMP,         0x14,
-            const.MEMORYMODE,         0x00,
+            const.CHARGEPUMP,
+            0x14,
+            const.MEMORYMODE,
+            0x00,
             const.SEGREMAP,
             const.COMSCANDEC,
-            const.SETCOMPINS,         0x12,
-            const.SETCONTRAST,        0xCF,
-            const.SETPRECHARGE,       0xF1,
-            const.SETVCOMDETECT,      0x40,
+            const.SETCOMPINS,
+            0x12,
+            const.SETCONTRAST,
+            0xCF,
+            const.SETPRECHARGE,
+            0xF1,
+            const.SETVCOMDETECT,
+            0x40,
             const.DISPLAYALLON_RESUME,
             const.NORMALDISPLAY,
-            const.DISPLAYON)
+            const.DISPLAYON,
+        )
 
     def display(self, image):
         """
         Takes a 1-bit image and dumps it to the SSD1306 OLED display.
         """
-        assert(image.mode == '1')
-        assert(image.size[0] == self.width)
-        assert(image.size[1] == self.height)
+        assert image.mode == "1"
+        assert image.size[0] == self.width
+        assert image.size[1] == self.height
 
         self.command(
-            const.COLUMNADDR, 0x00, self.width-1,  # Column start/end address
-            const.PAGEADDR,   0x00, self.pages-1)  # Page start/end address
+            const.COLUMNADDR,
+            0x00,
+            self.width - 1,  # Column start/end address
+            const.PAGEADDR,
+            0x00,
+            self.pages - 1,
+        )  # Page start/end address
 
         pix = list(image.getdata())
         step = self.width * 8
         buf = []
         for y in range(0, self.pages * step, step):
-            i = y + self.width-1
+            i = y + self.width - 1
             while i >= y:
                 byte = 0
                 for n in range(0, step, self.width):
