@@ -11,6 +11,7 @@ import sys
 if os.name != 'posix':
     sys.exit('platform not supported')
 import psutil
+import time
 
 from datetime import datetime
 from oled.device import ssd1306, sh1106
@@ -41,7 +42,7 @@ def cpu_usage():
     # load average, uptime
     uptime = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
     av1, av2, av3 = os.getloadavg()
-    return "Ld:%.1f %.1f %.1f Up: %s" \
+    return "CPU: %.1f %.1f %.1f Up: %s" \
             % (av1, av2, av3, str(uptime).split('.')[0])
 
 def mem_usage():
@@ -52,27 +53,37 @@ def mem_usage():
 
 def disk_usage(dir):
     usage = psutil.disk_usage(dir)
-    return "SD:  %s %.0f%%" \
+    return "Disk: %s %.0f%%" \
             % (bytes2human(usage.used), usage.percent)
 
-def network(iface):
+def network_utilization(iface):
     stat = psutil.net_io_counters(pernic=True)[iface]
-    return "%s: Tx%s, Rx%s" % \
-           (iface, bytes2human(stat.bytes_sent), bytes2human(stat.bytes_recv))
+    return f"Net load: Tx{bytes2human(stat.bytes_sent)}, Rx{bytes2human(stat.bytes_recv)}"
+
+def network_address(iface):
+    net_addresses = psutil.net_if_addrs()
+    eth0_address = net_addresses.get("eth0")[0]
+    return f"IP: {eth0_address.address}"
 
 def stats(oled):
     font = ImageFont.load_default()
-    font2 = ImageFont.truetype('../fonts/C&C Red Alert [INET].ttf', 12)
+
+    # font2 = ImageFont.truetype('/home/pihole/OrangePi-OLED/fonts/C&C Red Alert [INET].ttf', 12)
+    font2 = ImageFont.truetype('/home/pihole/OrangePi-OLED/fonts/pixelmix.ttf', 8)
     with canvas(oled) as draw:
-        draw.text((0, 0), cpu_usage(), font=font2, fill=255)
-        draw.text((0, 14), mem_usage(), font=font2, fill=255)
+        draw.text((0, 0), network_address('eth0'), font=font2, fill=255)
+        draw.text((0, 14), network_utilization('eth0'), font=font2, fill=255)
         draw.text((0, 26), disk_usage('/'), font=font2, fill=255)
-        draw.text((0, 38), network('eth0'), font=font2, fill=255)
-        draw.text((0, 50), "HALLO", font=font, fill=255)
+        draw.text((0, 38), mem_usage(), font=font2, fill=255)
+        draw.text((0, 50), cpu_usage(), font=font2, fill=255)
+
 
 def main():
-    oled = sh1106(port=1, address=0x3C)
-    stats(oled)
+    while True:
+        oled = sh1106(port=3, address=0x3C)
+        stats(oled)
+        time.sleep(5)
+
 
 if __name__ == "__main__":
     main()
