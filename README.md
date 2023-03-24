@@ -5,34 +5,66 @@ Based on Richard Hulls original repo (https://github.com/rm-hull) adapted to Ora
 Interfacing OLED matrix displays with the SH1106 (or SSD1306) driver in Python using
 I2C on Orange Pi SBCs. 
 
-## Pre-requisites
+## Supported Platforms
 
-This was tested with Armbian on an Orange Pi Zero, with Mainline Kernel .
+This was tested with:
+
+- Armbian on an Orange Pi Zero, with Mainline Kernel
+- Armbian on an Orange Pi Zero 2, with Maineline Kernel
+
+## Pre-requisites
 
 Install some packages(most should be already installed):
 
-    $ sudo apt-get install i2c-tools python-smbus python-pip python-dev python-imaging
+```bash
+sudo apt-get install i2c-tools python3-smbus python3-pip python3-dev gcc -y
+```
 
-Next check that the device is communicating properly:
+Optionally upgrade pip
 
-    $ i2cdetect -y 0
-         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-    00:          -- -- -- -- -- -- -- -- -- -- -- -- --
-    10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    30: -- -- -- -- -- -- -- -- -- -- -- -- 3c -- -- --
-    40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-    70: -- -- -- -- -- -- -- --
+```bash
+python3 -m pip install --upgrade pip
+```
+
+Install additional python dependenecies for `examples/sys_info.py`
+
+```bash
+python3 -m pip install --upgrade Pillow
+python3 -m pip install psutil
+```
+
+
+Next check that the device is communicating properly with the following command:
+
+```bash
+i2cdetect -y 0
+```
+
+Note: for orange pi zero 2 the display is on port 3
+
+A successfully attached display will show the following output:
+
+```bash
+        0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- -- -- -- -- -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- 3c -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+```
 
 # Installing the Python Package
 
 From the bash prompt, enter:
 
-    $ sudo python setup.py install
+```bash
+sudo python3 setup.py install
+```
 
-This will install the python files in `/usr/local/lib/python2.7`
+This will install the python files in `/usr/local/lib/python3`
 making them ready for use in other programs.
 
 # Software Display Driver
