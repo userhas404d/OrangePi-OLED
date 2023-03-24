@@ -67,8 +67,8 @@ def network_utilization(iface):
 
 def network_address(iface):
     net_addresses = psutil.net_if_addrs()
-    eth0_address = net_addresses.get("eth0")[0]
-    return f"IP: {eth0_address.address}"
+    iface_address = net_addresses.get(iface)[0]
+    return f"IP: {iface_address.address}"
 
 
 def stats(oled):
